@@ -50,6 +50,10 @@ export class DualChannelAudioEngine {
     this.audio1.preload = 'auto';
     this.audio0.crossOrigin = 'anonymous';
     this.audio1.crossOrigin = 'anonymous';
+    this.audio0.setAttribute('playsinline', 'true');
+    this.audio1.setAttribute('playsinline', 'true');
+    this.audio0.setAttribute('webkit-playsinline', 'true');
+    this.audio1.setAttribute('webkit-playsinline', 'true');
 
     this.setupAudioListeners(0, this.audio0);
     this.setupAudioListeners(1, this.audio1);

@@ -50,8 +50,8 @@ const AppContent: React.FC = () => {
 
       {/* Main Viewport Container */}
       <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-4 sm:pt-6 flex gap-6">
-        {/* Desktop Sidebar Navigation */}
-        <aside className="hidden sm:flex flex-col w-56 shrink-0 space-y-1.5 pb-28">
+        {/* Desktop Sidebar Navigation with Frosted Glass */}
+        <aside className="hidden sm:flex flex-col w-60 shrink-0 space-y-1.5 p-3 rounded-2xl bg-white/[0.03] backdrop-blur-2xl border border-white/10 shadow-2xl h-fit sticky top-20">
           <span className="text-[10px] font-mono font-bold tracking-widest text-[#ff3e3e] uppercase px-3 py-1">
             NAVIGATION
           </span>
@@ -68,7 +68,7 @@ const AppContent: React.FC = () => {
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-mono text-xs font-bold transition text-left ${
                   isActive
                     ? 'bg-[#ff3e3e] text-white shadow-lg shadow-[#ff3e3e]/25'
-                    : 'text-[#8c8c9e] hover:text-white hover:bg-[#16161c]'
+                    : 'text-[#8c8c9e] hover:text-white hover:bg-white/[0.06]'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -78,18 +78,18 @@ const AppContent: React.FC = () => {
           })}
 
           {/* Quick Hardware Spec Box */}
-          <div className="pt-6 mt-6 border-t border-[#1c1c24] px-3 space-y-2 text-[10px] font-mono text-[#606074]">
+          <div className="pt-4 mt-4 border-t border-white/10 px-2 space-y-1.5 text-[10px] font-mono text-[#606074]">
             <p className="text-[#a0a0b8] font-bold">SYSTEM SPECS</p>
             <p>Engine: Web Audio 2.0</p>
             <p>Channels: 2 (Dual DSP)</p>
             <p>Bass: 80Hz Low-Shelf</p>
             <p>EQ: 5-Band Biquad</p>
-            <p>Storage: IndexedDB</p>
+            <p>Background: Active Wake Lock</p>
           </div>
         </aside>
 
         {/* View Content Area */}
-        <main className="flex-1 min-w-0">
+        <main className="flex-1 min-w-0 pb-40 sm:pb-28">
           {currentView === 'dashboard' && <DashboardView />}
           {currentView === 'stream' && <StreamView />}
           {currentView === 'library' && <LibraryView />}

@@ -1,0 +1,88 @@
+Build a production-grade, offline-first progressive web app (PWA) and mobile audio player named "kaGO.PIaY" (Offline Audio Engine & Free Music Streamer). 
+
+The app must feature a high-contrast dark cyberpunk aesthetic (deep black `#0c0c0e`, dark slate `#16161a`, electric crimson `#ff3e3e`, and crisp white typography with Syne, Inter, and JetBrains Mono fonts) inspired by high-end hardware audio interfaces, turntables, and pro-audio workstations.
+
+---
+
+### 1. TECH STACK & SYSTEM ARCHITECTURE
+- **Frontend**: React 19, TypeScript, Tailwind CSS, Vite, Lucide React icons, and Web Audio API.
+- **Backend / Server**: Node.js Express server (`server.ts`) acting as an audio proxy, video resolver, and API orchestrator.
+- **Local Database & Storage**: Client-side IndexedDB (`kaGO_PIaY_Audio_DB`) storing audio blobs, albums, playlists, favorite IDs, playback history, and user settings.
+- **PWA & Mobile**: Offline Service Worker, Web App Manifest, maskable icons, mobile safe-area paddings (`env(safe-area-inset-bottom)`), MediaSession API integration (lockscreen and background notification playback controls), and Haptic Feedback engine (`navigator.vibrate`).
+- **Android Ready**: Ready for packaging with standard Android resource tree (`app/src/main/res/mipmap-*` densities) and `AndroidManifest.xml` with permissions for audio playback and storage.
+
+---
+
+### 2. CORE DUAL-ENGINE PLAYBACK ARCHITECTURE
+
+#### A. Native Web Audio Engine (100% Offline & Local Audio)
+- **Dual-Channel Audio Architecture**: Maintain two synchronized HTML5 Audio channels (`Channel 0` and `Channel 1`) connected to an `AudioContext` graph to enable true seamless crossfading (1s to 12s user-configurable) and gapless handoff transitions between consecutive tracks.
+- **Audio DSP Chain**:
+  - 80Hz Low-shelf Bass Boost filter with toggle and gain boost fader (0dB to +14dB).
+  - 5-Band Biquad Graphic Equalizer (60Hz, 230Hz, 910Hz, 3.6kHz, 14kHz) with pre-configured acoustic presets: Flat, Bass, Heavy Bass, Rock, Pop, Classical, Jazz, Electronic, Hip-Hop, Vocal Boost, Acoustic, and Treble Boost.
+  - Real-time `AnalyserNode` powering a 60fps canvas frequency spectrum visualizer and circular turntable vinyl visualizer.
+  - Master Gain Node with volume normalization and mute controls.
+- **Resilient Playback State & Error Boundary**:
+  - Always reset active channel gain nodes to `1.0` and standby to `0.0` on track switch so playback never gets stuck in a zero-gain muted state if crossfade transitions are cancelled or aborted.
+  - Handle browser `AbortError` and `NotAllowedError` autoplay restrictions smoothly by checking user gesture activation and restoring channel gain states without throwing unhandled promise rejections.
+
+#### B. Free Streaming Engine (YouTube & Remote Streams)
+- **Zero-Signup Streaming**: Integrated YouTube streaming view without user login, sign-up, or third-party auth requirements.
+- **Server Video Resolver (`/api/youtube/resolve`)**:
+  - YouTube deprecated `listType: 'search'`. The app MUST never pass search queries into embedded players.
+  - The server endpoint queries YouTube with video filters (`&sp=EgIQAQ%253D%253D`) and extracts authentic, 11-character alphanumeric video IDs (`^[a-zA-Z0-9_-]{11}$`), strictly filtering out 26-character Mix/Playlist IDs (`RDEM...`) which crash players.
+- **Auto-Recovery for Embed-Restricted Tracks (Error 150 / 101)**:
+  - When major labels (VEVO/UMG) block iframe embedding for an official music video, the player automatically catches error codes `150` and `101`, retrieves alternative audio/lyric versions of the exact same track, and seamlessly switches streams without showing cryptic YouTube error overlays.
+  - If all remote video streams are blocked by publisher licensing, the system gracefully falls back to local procedural studio synthesizer audio so sound never abruptly terminates.
+  - Provide an "Open on YouTube" direct deep-link button in the player for external viewing when desired.
+
+---
+
+### 3. USER INTERFACE & VIEWS
+
+1. **Dashboard & Featured Player**:
+   - Hero banner displaying featured track with procedural geometric waveform visualizer, "Quick Play", "Pick Song", and quick stats (Total Songs, Playback Time, Cached Audio, Audio Engine Status).
+   - Quick launch cards for Direct Offline Play, Equalizer & Bass, and Music Folders Batch Tool.
+
+2. **YouTube Stream View**:
+   - Live search bar supporting song titles, artists, direct YouTube video URLs, and 11-char video IDs.
+   - **Recent Searches Section**: Displays the last 5 successfully queried terms as interactive chips with a history badge, individual remove (`X`) buttons, and a "Clear all" action. Clicking any chip re-runs the query instantly.
+   - Pre-curated genre pills (Top Global Hits, Afrobeats, Hip-Hop & Rap, Lo-Fi Chill Beats, Synthwave 80s, Pop Anthems, Electronic & EDM, Rock Classics, R&B Soul).
+   - Stream cards grid with high-resolution thumbnails, duration stamps, quick "Stream", "Add to Queue", and "Favorite" buttons.
+
+3. **Music Library Views**:
+   - **All Songs**: Filterable, searchable track list displaying song title, artist, duration, format badge (`MP3`, `WAV`, `FLAC`, `STREAM`), and context menu (Edit/Rename metadata, Add to Playlist, Delete, Favorite).
+   - **Albums**: Grid grouping tracks by album with dynamic procedural album art palettes.
+   - **Artists**: Grid grouping tracks by artist with track counts and cumulative runtime.
+   - **Playlists**: Create custom playlists with personalized color themes, reorderable track lists, and batch track management.
+   - **Favorites**: Filtered view of all starred offline and streaming tracks.
+
+4. **Mini-Player & Fullscreen Turntable Player**:
+   - **Floating Mini-Player**: Fixed above bottom navigation, featuring animated waveform bars, track title, artist, interactive seek bar, skip previous/next, play/pause, rewind 10s, forward 10s, favorite toggle, and EQ drawer trigger.
+   - **Fullscreen Player View**:
+     - Mode switcher: Rotating Vinyl Turntable with responsive needle arm / YouTube Video Stream / Synchronized Lyrics / Playback Queue / Audio Info.
+     - Full volume slider, repeat modes (`off`, `all`, `one`), shuffle toggle with non-repeating randomized index queues.
+     - 10-second skip forward/back buttons.
+
+5. **Synchronized LRC Lyrics Engine**:
+   - Parses standard `.lrc` timestamped lyrics (e.g. `[01:23.45] lyric line`).
+   - Auto-scrolls and highlights the active singing lyric in glowing red text synchronized with audio playback timestamps.
+   - Timing Calibration Offset tool (`-2.0s` to `+2.0s` in 0.1s increments) to align lyric sync on device playback.
+   - Built-in lyric text editor and local `.lrc` file import tool.
+
+6. **Device Music Folder Scanner & Storage Tool**:
+   - Browser Directory Picker API (`showDirectoryPicker`) and webkitdirectory file input fallback to batch import local device folders without uploading files to any external server.
+   - ID3 tag and filename sanitizer: automatically parses raw filenames like `01 - Drake - Hotline Bling [Official Audio].mp3`, strips noisy publisher tags, and cleans foreign mojibake or corrupt diacritics into clean song titles and artist names.
+
+7. **5-Band Equalizer & Bass Modal**:
+   - Live interactive 5-band faders (-12dB to +12dB).
+   - One-tap presets selector with immediate Web Audio filter curve recalculation.
+   - Bass boost switch with intensity dial.
+   - Crossfade duration slider (0s to 12s) and gapless audio toggle.
+
+---
+
+### 4. VISUAL & INTERACTIVE IDENTITY
+- **Color Palette**: Pitch Black (`#000000`), Dark Gray (`#0c0c0e`, `#16161a`, `#202026`), Brand Red (`#ff3e3e`), Neon Coral (`#f43f5e`), Off-White (`#f2efeb`).
+- **App Launcher Icon**: Red triangular play button emblazoned with the white badge `kaGO || PlaY` on a `#171717` dark rounded squircle with subtle ambient crimson glow.
+- **Haptic Engine**: Micro-vibrations triggered on Play/Pause (light pulse), Track Skip (medium double pulse), and EQ adjustment (tick).

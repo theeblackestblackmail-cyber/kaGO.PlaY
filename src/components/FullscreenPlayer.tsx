@@ -80,12 +80,12 @@ export const FullscreenPlayer: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0c0c0e] flex flex-col text-[#f2efeb] animate-in slide-in-from-bottom duration-300 overflow-hidden">
-      {/* Top Bar */}
-      <div className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-[#1c1c24] bg-[#0c0c0e]/90 backdrop-blur z-20">
+    <div className="fixed inset-0 z-50 bg-[#0c0c0e]/95 backdrop-blur-3xl flex flex-col text-[#f2efeb] animate-in slide-in-from-bottom duration-300 overflow-hidden">
+      {/* Top Bar with Frosted Glass */}
+      <div className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-white/10 bg-black/40 backdrop-blur-2xl z-20">
         <button
           onClick={() => setIsFullscreenPlayerOpen(false)}
-          className="p-2 text-gray-400 hover:text-white hover:bg-[#1a1a22] rounded-xl transition"
+          className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition active:scale-95"
           aria-label="Minimize Player"
         >
           <ChevronDown className="w-6 h-6" />
@@ -102,19 +102,21 @@ export const FullscreenPlayer: React.FC = () => {
 
         <button
           onClick={() => setIsEQModalOpen(true)}
-          className="p-2 text-gray-400 hover:text-[#ff3e3e] hover:bg-[#1a1a22] rounded-xl transition"
+          className="p-2 text-gray-400 hover:text-[#ff3e3e] hover:bg-white/10 rounded-full transition active:scale-95"
           aria-label="Open Equalizer"
         >
           <Sliders className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Mode Navigation Tabs */}
-      <div className="flex items-center justify-center gap-2 py-2.5 px-4 bg-[#121216] border-b border-[#1c1c24] z-20 overflow-x-auto">
+      {/* Mode Navigation Tabs with Glass Pill Styling */}
+      <div className="flex items-center justify-center gap-1.5 py-2.5 px-4 bg-black/30 backdrop-blur-xl border-b border-white/10 z-20 overflow-x-auto">
         <button
           onClick={() => setActiveTab('visualizer')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition ${
-            activeTab === 'visualizer' ? 'bg-[#ff3e3e] text-white font-bold' : 'text-gray-400 hover:text-white'
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono transition-all ${
+            activeTab === 'visualizer'
+              ? 'bg-white/20 backdrop-blur-xl border border-white/30 text-white font-bold shadow-[0_2px_12px_rgba(255,255,255,0.15)]'
+              : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
           }`}
         >
           <Disc className="w-3.5 h-3.5" />
@@ -123,8 +125,10 @@ export const FullscreenPlayer: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('lyrics')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition ${
-            activeTab === 'lyrics' ? 'bg-[#ff3e3e] text-white font-bold' : 'text-gray-400 hover:text-white'
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono transition-all ${
+            activeTab === 'lyrics'
+              ? 'bg-white/20 backdrop-blur-xl border border-white/30 text-white font-bold shadow-[0_2px_12px_rgba(255,255,255,0.15)]'
+              : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
@@ -133,8 +137,10 @@ export const FullscreenPlayer: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('queue')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition ${
-            activeTab === 'queue' ? 'bg-[#ff3e3e] text-white font-bold' : 'text-gray-400 hover:text-white'
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono transition-all ${
+            activeTab === 'queue'
+              ? 'bg-white/20 backdrop-blur-xl border border-white/30 text-white font-bold shadow-[0_2px_12px_rgba(255,255,255,0.15)]'
+              : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
           }`}
         >
           <ListMusic className="w-3.5 h-3.5" />
@@ -143,8 +149,10 @@ export const FullscreenPlayer: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('dsp')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition ${
-            activeTab === 'dsp' ? 'bg-[#ff3e3e] text-white font-bold' : 'text-gray-400 hover:text-white'
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono transition-all ${
+            activeTab === 'dsp'
+              ? 'bg-white/20 backdrop-blur-xl border border-white/30 text-white font-bold shadow-[0_2px_12px_rgba(255,255,255,0.15)]'
+              : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
           }`}
         >
           <Radio className="w-3.5 h-3.5" />
@@ -307,10 +315,11 @@ export const FullscreenPlayer: React.FC = () => {
         )}
       </div>
 
-      {/* Bottom Track Meta & Controls Section */}
-      <div className="w-full max-w-2xl mx-auto px-6 pb-8 pt-2 space-y-4 z-20">
-        {/* Track Title & Artist Info + Heart */}
-        <div className="flex items-center justify-between">
+      {/* Bottom Track Meta & Controls Section with Frosted Glass Deck */}
+      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 pb-6 pt-2 z-20">
+        <div className="bg-black/50 backdrop-blur-3xl border border-white/15 rounded-3xl p-5 sm:p-6 shadow-[0_16px_50px_rgba(0,0,0,0.7)] ring-1 ring-white/10 space-y-4">
+          {/* Track Title & Artist Info + Heart */}
+          <div className="flex items-center justify-between">
           <div className="truncate pr-4">
             <h1 className="text-xl sm:text-2xl font-bold font-brand tracking-wide text-white truncate">
               {activeTrack.title}
@@ -443,28 +452,29 @@ export const FullscreenPlayer: React.FC = () => {
           </button>
         </div>
 
-        {/* Volume Slider Bar */}
-        <div className="flex items-center gap-3 pt-2">
-          <button
-            onClick={() => updateSettingsState({ volume: settings.volume > 0 ? 0 : 0.8 })}
-            className="text-gray-400 hover:text-white"
-            aria-label="Mute toggle"
-          >
-            {settings.volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={settings.volume}
-            onChange={(e) => updateSettingsState({ volume: parseFloat(e.target.value) })}
-            className="w-full h-1 bg-[#202028] accent-[#ff3e3e] rounded cursor-pointer"
-            aria-label="Volume slider"
-          />
-          <span className="text-[11px] font-mono text-[#8c8c9e] w-8 text-right">
-            {Math.round(settings.volume * 100)}%
-          </span>
+          {/* Volume Slider Bar */}
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              onClick={() => updateSettingsState({ volume: settings.volume > 0 ? 0 : 0.8 })}
+              className="text-gray-400 hover:text-white"
+              aria-label="Mute toggle"
+            >
+              {settings.volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={settings.volume}
+              onChange={(e) => updateSettingsState({ volume: parseFloat(e.target.value) })}
+              className="w-full h-1 bg-[#202028] accent-[#ff3e3e] rounded cursor-pointer"
+              aria-label="Volume slider"
+            />
+            <span className="text-[11px] font-mono text-[#8c8c9e] w-8 text-right">
+              {Math.round(settings.volume * 100)}%
+            </span>
+          </div>
         </div>
       </div>
     </div>

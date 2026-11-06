@@ -150,12 +150,142 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     initData();
   }, []);
 
+  // Hidden background carrier audio ref to guarantee Android / Samsung keeps playback alive when app is backgrounded
+  const carrierAudioRef = useRef<HTMLAudioElement | null>(null);
+  const wakeLockRef = useRef<any>(null);
+
+  // Helper to resolve absolute artwork URLs for Samsung Now Bar and Android System Media Player
+  const getArtworkList = useCallback((thumb?: string) => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    let src = thumb || `${origin}/pwa-512x512.png`;
+    if (src.startsWith('/')) {
+      src = `${origin}${src}`;
+    }
+    return [
+      { src, sizes: '96x96', type: 'image/png' },
+      { src, sizes: '128x128', type: 'image/png' },
+      { src, sizes: '192x192', type: 'image/png' },
+      { src, sizes: '256x256', type: 'image/png' },
+      { src, sizes: '384x384', type: 'image/png' },
+      { src, sizes: '512x512', type: 'image/png' },
+    ];
+  }, []);
+
+  // Sync Samsung Now Bar & Android Media Position State
+  const syncMediaSessionPosition = useCallback((cur: number, dur: number) => {
+    if (
+      typeof navigator !== 'undefined' &&
+      'mediaSession' in navigator &&
+      'setPositionState' in navigator.mediaSession &&
+      dur > 0 &&
+      Number.isFinite(dur) &&
+      Number.isFinite(cur)
+    ) {
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: Math.max(0.1, dur),
+          playbackRate: 1.0,
+          position: Math.max(0, Math.min(cur, dur)),
+        });
+      } catch {
+        // Ignore bounds check exceptions during fast seeks
+      }
+    }
+  }, []);
+
+  // Request & release wake lock for screen / audio keepalive
+  const requestWakeLock = useCallback(async () => {
+    if (typeof navigator !== 'undefined' && 'wakeLock' in navigator) {
+      try {
+        if (!wakeLockRef.current) {
+          wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+        }
+      } catch {
+        // WakeLock request can fail if device battery is low or policy disallows
+      }
+    }
+  }, []);
+
+  const releaseWakeLock = useCallback(() => {
+    if (wakeLockRef.current) {
+      try {
+        wakeLockRef.current.release().catch(() => {});
+      } catch {}
+      wakeLockRef.current = null;
+    }
+  }, []);
+
+  // Initialize background carrier audio element
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const audio = new Audio();
+      // 1-second silent stereo PCM WAV in base64
+      audio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAP8A/w==';
+      audio.loop = true;
+      audio.volume = 0.01;
+      audio.setAttribute('playsinline', 'true');
+      audio.setAttribute('webkit-playsinline', 'true');
+      carrierAudioRef.current = audio;
+    }
+
+    return () => {
+      releaseWakeLock();
+      if (carrierAudioRef.current) {
+        carrierAudioRef.current.pause();
+        carrierAudioRef.current.src = '';
+      }
+    };
+  }, [releaseWakeLock]);
+
+  // Keep audio alive across page hide / app switching (gaming, texting, lock screen)
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        // User switched to another app or locked screen: ensure audio engine doesn't pause
+        if (engineRef.current && isPlaying) {
+          engineRef.current.resume();
+        }
+      } else {
+        // Returned to app: re-verify wake lock if still playing
+        if (isPlaying) {
+          requestWakeLock();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [isPlaying, requestWakeLock]);
+
+  // Sync carrier audio & wake lock to isPlaying
+  useEffect(() => {
+    if (isPlaying) {
+      requestWakeLock();
+      if (carrierAudioRef.current) {
+        carrierAudioRef.current.play().catch(() => {});
+      }
+    } else {
+      releaseWakeLock();
+      if (carrierAudioRef.current) {
+        carrierAudioRef.current.pause();
+      }
+    }
+
+    // Sync playback state to Samsung Now Bar & Android Media Player
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+    }
+  }, [isPlaying, requestWakeLock, releaseWakeLock]);
+
   // Initialize Dual-Channel Web Audio Engine
   useEffect(() => {
     const engine = new DualChannelAudioEngine(settings, {
       onTimeUpdate: (cur, dur) => {
         setCurrentTime(cur);
-        if (dur && Number.isFinite(dur)) setDuration(dur);
+        if (dur && Number.isFinite(dur)) {
+          setDuration(dur);
+          syncMediaSessionPosition(cur, dur);
+        }
       },
       onEnded: () => {
         handleTrackEnded();
@@ -177,9 +307,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => {
       engine.destroy();
     };
-  }, []);
+  }, [syncMediaSessionPosition]);
 
-  // Update MediaSession API for mobile lockscreen & background playback
+  // Update MediaSession API for Samsung Now Bar, Lockscreen & Android Notification Media Player
   useEffect(() => {
     if (typeof navigator === 'undefined' || !('mediaSession' in navigator) || !activeTrack) return;
 
@@ -188,25 +318,39 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         title: activeTrack.title,
         artist: activeTrack.artist,
         album: activeTrack.album || 'kaGO.PIaY Pro Audio',
-        artwork: [
-          { src: activeTrack.thumbnail || '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: activeTrack.thumbnail || '/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-        ],
+        artwork: getArtworkList(activeTrack.thumbnail),
       });
 
-      navigator.mediaSession.setActionHandler('play', () => togglePlay());
-      navigator.mediaSession.setActionHandler('pause', () => togglePlay());
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+
+      // Comprehensive action handlers for Samsung Now Bar and Android Lock Screen
+      navigator.mediaSession.setActionHandler('play', () => {
+        if (!isPlaying) togglePlay();
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        if (isPlaying) togglePlay();
+      });
+      navigator.mediaSession.setActionHandler('stop', () => {
+        if (isPlaying) togglePlay();
+        seek(0);
+      });
       navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
       navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
       navigator.mediaSession.setActionHandler('seekto', (details) => {
-        if (details.seekTime !== undefined) seek(details.seekTime);
+        if (details.seekTime !== undefined && Number.isFinite(details.seekTime)) {
+          seek(details.seekTime);
+        }
       });
-      navigator.mediaSession.setActionHandler('seekbackward', () => skipRelative(-10));
-      navigator.mediaSession.setActionHandler('seekforward', () => skipRelative(10));
+      navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+        skipRelative(-(details?.seekOffset || 10));
+      });
+      navigator.mediaSession.setActionHandler('seekforward', (details) => {
+        skipRelative(details?.seekOffset || 10);
+      });
     } catch (e) {
-      console.warn('MediaSession registration error:', e);
+      console.warn('Samsung Now Bar / MediaSession registration exception:', e);
     }
-  }, [activeTrack]);
+  }, [activeTrack, isPlaying, getArtworkList]);
 
   const refreshTracks = async () => {
     const list = await getAllTracks();
@@ -427,7 +571,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const cur = ytPlayerRef.current.getCurrentTime() || 0;
         const dur = ytPlayerRef.current.getDuration() || 0;
         setCurrentTime(cur);
-        if (dur) setDuration(dur);
+        if (dur) {
+          setDuration(dur);
+          syncMediaSessionPosition(cur, dur);
+        }
       }
     }, 250);
   };
@@ -542,11 +689,13 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (isStreamMode && ytPlayerRef.current && typeof ytPlayerRef.current.seekTo === 'function') {
       ytPlayerRef.current.seekTo(seconds, true);
       setCurrentTime(seconds);
+      syncMediaSessionPosition(seconds, duration);
       return;
     }
     if (engineRef.current) {
       engineRef.current.seek(seconds);
       setCurrentTime(seconds);
+      syncMediaSessionPosition(seconds, duration);
     }
   };
 

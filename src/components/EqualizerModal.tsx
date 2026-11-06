@@ -48,8 +48,8 @@ export const EqualizerModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-[#121216] border border-[#262632] rounded-2xl shadow-2xl p-5 sm:p-7 overflow-hidden text-[#f2efeb] max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xl p-4 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-2xl bg-black/75 backdrop-blur-3xl border border-white/20 rounded-3xl shadow-[0_24px_70px_rgba(0,0,0,0.8)] ring-1 ring-white/10 p-5 sm:p-7 overflow-hidden text-[#f2efeb] max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-[#202026]">
           <div className="flex items-center gap-2.5">

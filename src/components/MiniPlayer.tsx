@@ -25,8 +25,8 @@ export const MiniPlayer: React.FC = () => {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="fixed bottom-16 sm:bottom-0 left-0 right-0 z-30 px-3 sm:px-6 pb-2 pointer-events-none">
-      <div className="max-w-4xl mx-auto bg-[#141418]/95 backdrop-blur-xl border border-[#262634] rounded-2xl shadow-2xl p-2.5 sm:p-3 pointer-events-auto flex flex-col gap-1.5 transition-all">
+    <div className="fixed bottom-20 sm:bottom-4 left-0 right-0 z-30 px-3 sm:px-6 pointer-events-none transition-all">
+      <div className="max-w-4xl mx-auto bg-black/55 backdrop-blur-3xl border border-white/15 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.75)] ring-1 ring-white/10 p-2.5 sm:p-3 pointer-events-auto flex flex-col gap-1.5 transition-all">
         {/* Interactive Seek Bar on Top */}
         <div className="w-full relative flex items-center group cursor-pointer -mt-1">
           <input
@@ -36,7 +36,7 @@ export const MiniPlayer: React.FC = () => {
             step="0.1"
             value={currentTime}
             onChange={(e) => seek(parseFloat(e.target.value))}
-            className="w-full h-1 bg-[#242430] accent-[#ff3e3e] rounded-full cursor-pointer"
+            className="w-full h-1 bg-white/10 accent-[#ff3e3e] rounded-full cursor-pointer hover:h-1.5 transition-all"
             aria-label="Seek track"
           />
         </div>
