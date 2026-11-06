@@ -23,19 +23,24 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Node Dependencies
-        run: npm install --legacy-peer-deps
+      - name: Install Project Dependencies
+        run: |
+          npm install --legacy-peer-deps
+          npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
 
       - name: Build Web Application
         run: npm run build
 
-      - name: Ensure Android Platform Exists & Sync
+      - name: Ensure Capacitor Config Exists
         run: |
-          if [ ! -d "android" ] || [ ! -f "android/gradlew" ]; then
-            echo "Android directory or gradlew missing. Initializing Capacitor Android..."
-            rm -rf android
-            npx cap add android
+          if [ ! -f "capacitor.config.ts" ] && [ ! -f "capacitor.config.json" ]; then
+            echo '{"appId":"com.kago.play.audio","appName":"kaGO.PIaY","webDir":"dist","server":{"androidScheme":"https","cleartext":true}}' > capacitor.config.json
           fi
+
+      - name: Initialize & Sync Android Platform
+        run: |
+          rm -rf android
+          npx cap add android
           npx cap sync android
 
       - name: Set up Java JDK 17
@@ -44,21 +49,19 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Grant Execute Permission to gradlew
         run: chmod +x android/gradlew
 
       - name: Build Debug APK with Gradle
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon
 
-      - name: Rename APK for Easy Identification
+      - name: Locate & Prepare Output APK
         run: |
           mkdir -p output
-          cp android/app/build/outputs/apk/debug/app-debug.apk output/kaGO-PIaY-v1.0.0-debug.apk
+          find android/app/build/outputs/apk -name "*.apk" -exec cp {} output/kaGO-PIaY-v1.0.0-debug.apk \;
+          ls -la output/
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
@@ -66,13 +69,3 @@ jobs:
           name: kaGO-PIaY-debug-apk
           path: output/kaGO-PIaY-v1.0.0-debug.apk
           retention-days: 30
-
-      - name: Create GitHub Release (on tag or main dispatch)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: output/kaGO-PIaY-v1.0.0-debug.apk
-          name: kaGO.PIaY Android Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
