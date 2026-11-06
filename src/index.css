@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-brand: 'Syne', sans-serif;
+    --font-sans: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #0c0c0e;
+    color: #f2efeb;
+  }
+}
+
+.font-brand {
+  font-family: var(--font-brand);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0c0c0e;
+}
+::-webkit-scrollbar-thumb {
+  background: #202026;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff3e3e;
+}
+
+/* Safe area padding utilities */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Turntable Vinyl Spin Animation */
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-vinyl {
+  animation: spinSlow 3s linear infinite;
+}
+
+.animate-spin-vinyl-paused {
+  animation: spinSlow 3s linear infinite;
+  animation-play-state: paused;
+}
+
+/* Cyberpunk Glow Utilities */
+.crimson-glow {
+  box-shadow: 0 0 25px -4px rgba(255, 62, 62, 0.45);
+}
+
+.crimson-glow-sm {
+  box-shadow: 0 0 12px -2px rgba(255, 62, 62, 0.35);
+}
+
+.crimson-text-glow {
+  text-shadow: 0 0 10px rgba(255, 62, 62, 0.6);
+}

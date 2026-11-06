@@ -1,0 +1,8 @@
+{
+  "name": "kaGO.PIaY",
+  "description": "Offline Audio Engine & Free Music Streamer - Cyberpunk Pro Audio Player with Dual-Channel Web Audio DSP, Seamless Crossfade, 5-Band Equalizer, Turntable Visualizer, and YouTube Streaming.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
