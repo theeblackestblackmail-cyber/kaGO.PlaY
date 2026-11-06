@@ -5,6 +5,7 @@ export interface Track {
   title: string;
   artist: string;
   album: string;
+  folder?: string;
   duration: number; // in seconds
   format: AudioFormat;
   url?: string; // blob URL, synthesized audio URL, or remote stream URL
@@ -53,4 +54,4 @@ export interface AudioSettings {
 }
 
 export type ViewType = 'dashboard' | 'stream' | 'library' | 'import' | 'lyrics';
-export type LibrarySubTab = 'all' | 'albums' | 'artists' | 'playlists' | 'favorites';
+export type LibrarySubTab = 'all' | 'folders' | 'playlists' | 'albums' | 'artists' | 'favorites';

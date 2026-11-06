@@ -91,6 +91,7 @@ export const INITIAL_DEMO_TRACKS: Track[] = DEMO_CONFIGS.map(cfg => ({
   title: cfg.title,
   artist: cfg.artist,
   album: cfg.album,
+  folder: 'Cyber Stems',
   duration: cfg.duration,
   format: 'SYNTH',
   lyrics: cfg.lrcLyrics,

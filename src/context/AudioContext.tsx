@@ -36,7 +36,7 @@ interface AudioContextValue {
   toggleFavorite: (trackId: string) => Promise<void>;
   removeTrack: (trackId: string) => Promise<void>;
   editTrackMeta: (trackId: string, partial: Partial<Track>) => Promise<void>;
-  importTracks: (files: File[]) => Promise<number>;
+  importTracks: (files: File[], defaultFolder?: string) => Promise<number>;
 
   // Playback State
   activeTrack: Track | null;
@@ -388,9 +388,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const importTracks = async (files: File[]): Promise<number> => {
+  const importTracks = async (files: File[], defaultFolder?: string): Promise<number> => {
     let imported = 0;
     const { sanitizeFilename } = await import('../utils/filenameSanitizer');
+    const { extractFolderName } = await import('../utils/folderHelper');
 
     for (const file of files) {
       if (!file.type.startsWith('audio/') && !file.name.match(/\.(mp3|wav|flac|ogg|m4a|aac)$/i)) {
@@ -399,12 +400,14 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const meta = sanitizeFilename(file.name);
       const id = `track-local-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
       const url = URL.createObjectURL(file);
+      const folder = extractFolderName(file, defaultFolder || 'Device Storage');
 
       const track: Track = {
         id,
         title: meta.title,
         artist: meta.artist,
         album: meta.album,
+        folder,
         duration: 180, // Estimated initially, updated on play
         format: meta.format,
         url,
