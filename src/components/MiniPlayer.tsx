@@ -25,8 +25,8 @@ export const MiniPlayer: React.FC = () => {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="fixed bottom-20 sm:bottom-4 left-0 right-0 z-30 px-3 sm:px-6 pointer-events-none transition-all">
-      <div className="max-w-4xl mx-auto bg-black/55 backdrop-blur-3xl border border-white/15 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.75)] ring-1 ring-white/10 p-2.5 sm:p-3 pointer-events-auto flex flex-col gap-1.5 transition-all">
+    <div className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+4.5rem)] md:bottom-4 left-0 right-0 z-30 px-2 sm:px-4 md:px-6 pointer-events-none transition-all">
+      <div className="max-w-4xl 2xl:max-w-5xl mx-auto bg-black/60 backdrop-blur-3xl border border-white/15 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.75)] ring-1 ring-white/10 p-2 sm:p-3 pointer-events-auto flex flex-col gap-1 transition-all">
         {/* Interactive Seek Bar on Top */}
         <div className="w-full relative flex items-center group cursor-pointer -mt-1">
           <input
@@ -36,19 +36,19 @@ export const MiniPlayer: React.FC = () => {
             step="0.1"
             value={currentTime}
             onChange={(e) => seek(parseFloat(e.target.value))}
-            className="w-full h-1 bg-white/10 accent-[#ff3e3e] rounded-full cursor-pointer hover:h-1.5 transition-all"
+            className="w-full h-1 bg-white/15 accent-[#ff3e3e] rounded-full cursor-pointer hover:h-1.5 transition-all"
             aria-label="Seek track"
           />
         </div>
 
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-2 sm:gap-3">
           {/* Left: Thumbnail & Title (opens Fullscreen Player on click) */}
           <div
             onClick={() => setIsFullscreenPlayerOpen(true)}
-            className="flex items-center gap-3 cursor-pointer min-w-0 flex-1 group"
+            className="flex items-center gap-2 sm:gap-3 cursor-pointer min-w-0 flex-1 group"
           >
             {/* Spinning Disc / Thumbnail */}
-            <div className="relative w-11 h-11 rounded-xl bg-[#1c1c24] border border-[#2a2a38] flex items-center justify-center shrink-0 overflow-hidden shadow">
+            <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-[#1c1c24] border border-white/10 flex items-center justify-center shrink-0 overflow-hidden shadow">
               {activeTrack.thumbnail ? (
                 <img
                   src={activeTrack.thumbnail}
@@ -56,34 +56,34 @@ export const MiniPlayer: React.FC = () => {
                   className={`w-full h-full object-cover ${isPlaying ? 'animate-spin-vinyl' : 'animate-spin-vinyl-paused'}`}
                 />
               ) : (
-                <Disc className={`w-6 h-6 text-[#ff3e3e] ${isPlaying ? 'animate-spin-vinyl' : 'animate-spin-vinyl-paused'}`} />
+                <Disc className={`w-5 h-5 sm:w-6 sm:h-6 text-[#ff3e3e] ${isPlaying ? 'animate-spin-vinyl' : 'animate-spin-vinyl-paused'}`} />
               )}
               {/* Center red pin */}
-              <div className="absolute w-2 h-2 rounded-full bg-[#ff3e3e] border border-white" />
+              <div className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#ff3e3e] border border-white" />
             </div>
 
             {/* Title & Artist */}
             <div className="truncate">
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-white group-hover:text-[#ff3e3e] transition truncate">
+                <span className="text-xs sm:text-sm font-bold text-white group-hover:text-[#ff3e3e] transition truncate">
                   {activeTrack.title}
                 </span>
-                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#ff3e3e]/20 text-[#ff3e3e]">
+                <span className="text-[8px] sm:text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#ff3e3e]/20 text-[#ff3e3e] shrink-0">
                   CH{activeChannel}
                 </span>
               </div>
-              <p className="text-[11px] text-[#8c8c9e] truncate">
+              <p className="text-[10px] sm:text-[11px] text-[#8c8c9e] truncate">
                 {activeTrack.artist}
               </p>
             </div>
           </div>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-0.5 sm:gap-1.5 md:gap-2 shrink-0">
             {/* Rewind 10s */}
             <button
               onClick={() => skipRelative(-10)}
-              className="p-1.5 text-gray-400 hover:text-white transition hidden xs:block"
+              className="p-1.5 text-gray-400 hover:text-white transition hidden md:block"
               aria-label="Rewind 10s"
             >
               <RotateCcw className="w-4 h-4" />
@@ -92,7 +92,7 @@ export const MiniPlayer: React.FC = () => {
             {/* Prev Track */}
             <button
               onClick={prevTrack}
-              className="p-1.5 text-gray-400 hover:text-white transition"
+              className="p-1 sm:p-1.5 text-gray-300 hover:text-white transition"
               aria-label="Previous track"
             >
               <SkipBack className="w-4 h-4" />
@@ -101,20 +101,20 @@ export const MiniPlayer: React.FC = () => {
             {/* Play/Pause */}
             <button
               onClick={togglePlay}
-              className="w-10 h-10 rounded-full bg-[#ff3e3e] hover:bg-[#e03030] text-white flex items-center justify-center shadow-md shadow-[#ff3e3e]/30 transition transform active:scale-95"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#ff3e3e] hover:bg-[#e03030] text-white flex items-center justify-center shadow-md shadow-[#ff3e3e]/30 transition transform active:scale-95"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
-                <Pause className="w-5 h-5 fill-white" />
+                <Pause className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
               ) : (
-                <Play className="w-5 h-5 fill-white ml-0.5" />
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-white ml-0.5" />
               )}
             </button>
 
             {/* Next Track */}
             <button
               onClick={nextTrack}
-              className="p-1.5 text-gray-400 hover:text-white transition"
+              className="p-1 sm:p-1.5 text-gray-300 hover:text-white transition"
               aria-label="Next track"
             >
               <SkipForward className="w-4 h-4" />
@@ -123,7 +123,7 @@ export const MiniPlayer: React.FC = () => {
             {/* Forward 10s */}
             <button
               onClick={() => skipRelative(10)}
-              className="p-1.5 text-gray-400 hover:text-white transition hidden xs:block"
+              className="p-1.5 text-gray-400 hover:text-white transition hidden md:block"
               aria-label="Forward 10s"
             >
               <RotateCw className="w-4 h-4" />
@@ -132,7 +132,7 @@ export const MiniPlayer: React.FC = () => {
             {/* Favorite Toggle */}
             <button
               onClick={() => toggleFavorite(activeTrack.id)}
-              className="p-1.5 text-gray-400 hover:text-[#ff3e3e] transition"
+              className="p-1 sm:p-1.5 text-gray-400 hover:text-[#ff3e3e] transition"
               aria-label="Toggle Favorite"
             >
               <Heart

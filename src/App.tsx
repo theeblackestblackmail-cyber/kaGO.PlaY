@@ -36,9 +36,9 @@ const AppContent: React.FC = () => {
   }, []);
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'stream', label: 'YouTube Stream', icon: Radio },
-    { id: 'library', label: 'Music Library', icon: Library },
+    { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
+    { id: 'stream', label: 'Stream', icon: Radio },
+    { id: 'library', label: 'Library', icon: Library },
     { id: 'lyrics', label: 'Sync Lyrics', icon: FileText },
     { id: 'import', label: 'Folder Scanner', icon: FolderDown },
   ] as const;
@@ -49,9 +49,9 @@ const AppContent: React.FC = () => {
       <Navbar />
 
       {/* Main Viewport Container */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-4 sm:pt-6 flex gap-6">
-        {/* Desktop Sidebar Navigation with Frosted Glass */}
-        <aside className="hidden sm:flex flex-col w-60 shrink-0 space-y-1.5 p-3 rounded-2xl bg-white/[0.03] backdrop-blur-2xl border border-white/10 shadow-2xl h-fit sticky top-20">
+      <div className="flex-1 max-w-7xl 2xl:max-w-[1536px] w-full mx-auto px-3 sm:px-6 pt-3 sm:pt-6 flex gap-4 lg:gap-6">
+        {/* Desktop & Tablet Landscape Sidebar Navigation with Frosted Glass */}
+        <aside className="hidden md:flex flex-col w-52 lg:w-60 shrink-0 space-y-1.5 p-3 rounded-2xl bg-white/[0.03] backdrop-blur-2xl border border-white/10 shadow-2xl h-fit sticky top-20">
           <span className="text-[10px] font-mono font-bold tracking-widest text-[#ff3e3e] uppercase px-3 py-1">
             NAVIGATION
           </span>

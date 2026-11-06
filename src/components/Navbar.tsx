@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAudio } from '../context/AudioContext';
-import { PWAInstallButton } from './PWAInstallButton';
 import { Sliders, Wifi, WifiOff } from 'lucide-react';
 import { haptic } from '../utils/haptics';
 
@@ -77,9 +76,6 @@ export const Navbar: React.FC = () => {
 
         {/* Actions Right */}
         <div className="flex items-center gap-2">
-          {/* PWA Install Button */}
-          <PWAInstallButton />
-
           {/* Equalizer Quick Button with Glass Effect */}
           <button
             onClick={() => {
