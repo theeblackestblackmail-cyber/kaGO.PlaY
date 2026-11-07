@@ -29,16 +29,19 @@ jobs:
         with:
           node-version: 20
 
-      - name: Accept Android SDK Licenses
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-
       - name: Install Project Dependencies
         run: |
-          npm install --legacy-peer-deps
+          rm -f package-lock.json bun.lock
+          npm install --force
 
       - name: Build Web Application
         run: npm run build
+
+      - name: Ensure Capacitor Config Exists
+        run: |
+          if [ ! -f "capacitor.config.ts" ] && [ ! -f "capacitor.config.json" ]; then
+            echo '{"appId":"com.kago.play.audio","appName":"kaGO.PIaY","webDir":"dist","server":{"androidScheme":"https","cleartext":true}}' > capacitor.config.json
+          fi
 
       - name: Sync Android Platform
         run: |
