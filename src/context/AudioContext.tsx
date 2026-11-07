@@ -392,24 +392,40 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     let imported = 0;
     const { sanitizeFilename } = await import('../utils/filenameSanitizer');
     const { extractFolderName } = await import('../utils/folderHelper');
+    const { readID3Metadata } = await import('../utils/id3Reader');
 
     for (const file of files) {
       if (!file.type.startsWith('audio/') && !file.name.match(/\.(mp3|wav|flac|ogg|m4a|aac)$/i)) {
         continue;
       }
-      const meta = sanitizeFilename(file.name);
+      const cleanFromFilename = sanitizeFilename(file.name);
+      let title = cleanFromFilename.title;
+      let artist = cleanFromFilename.artist;
+      let album = cleanFromFilename.album;
+
+      try {
+        const id3 = await readID3Metadata(file);
+        if (id3.hasId3) {
+          if (id3.title && id3.title.trim()) title = id3.title.trim();
+          if (id3.artist && id3.artist.trim()) artist = id3.artist.trim();
+          if (id3.album && id3.album.trim()) album = id3.album.trim();
+        }
+      } catch (err) {
+        console.debug('Failed reading ID3 tags, using sanitized filename:', err);
+      }
+
       const id = `track-local-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
       const url = URL.createObjectURL(file);
       const folder = extractFolderName(file, defaultFolder || 'Device Storage');
 
       const track: Track = {
         id,
-        title: meta.title,
-        artist: meta.artist,
-        album: meta.album,
+        title,
+        artist,
+        album,
         folder,
         duration: 180, // Estimated initially, updated on play
-        format: meta.format,
+        format: cleanFromFilename.format,
         url,
         blob: file,
         addedAt: Date.now(),

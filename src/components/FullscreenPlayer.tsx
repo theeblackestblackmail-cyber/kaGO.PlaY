@@ -235,7 +235,7 @@ export const FullscreenPlayer: React.FC = () => {
                     onClick={() => seek(l.time)}
                     className={`cursor-pointer transition-all duration-200 select-none ${
                       isActive
-                        ? 'text-white text-2xl font-bold font-brand crimson-text-glow scale-105'
+                        ? 'text-[#ff3e3e] text-2xl font-extrabold font-brand tracking-wide drop-shadow-[0_0_15px_rgba(255,62,62,0.95)] crimson-text-glow scale-105'
                         : 'text-[#606074] hover:text-[#a0a0b8] text-base font-medium'
                     }`}
                   >
