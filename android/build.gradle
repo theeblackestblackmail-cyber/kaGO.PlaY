@@ -22,14 +22,22 @@ allprojects {
         google()
         mavenCentral()
     }
-}
 
-subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty("android")) {
-            project.tasks.withType(com.android.build.gradle.internal.tasks.CheckAarMetadataTask).configureEach {
-                enabled = false
-            }
+    // Propagate variables so subprojects find them via project.hasProperty()
+    project.ext.set('compileSdkVersion', rootProject.ext.compileSdkVersion)
+    project.ext.set('targetSdkVersion', rootProject.ext.targetSdkVersion)
+    project.ext.set('minSdkVersion', rootProject.ext.minSdkVersion)
+    project.ext.set('androidxActivityVersion', rootProject.ext.androidxActivityVersion)
+    project.ext.set('androidxAppCompatVersion', rootProject.ext.androidxAppCompatVersion)
+    project.ext.set('androidxCoordinatorLayoutVersion', rootProject.ext.androidxCoordinatorLayoutVersion)
+    project.ext.set('androidxCoreVersion', rootProject.ext.androidxCoreVersion)
+    project.ext.set('androidxFragmentVersion', rootProject.ext.androidxFragmentVersion)
+    project.ext.set('coreSplashScreenVersion', rootProject.ext.coreSplashScreenVersion)
+    project.ext.set('androidxWebkitVersion', rootProject.ext.androidxWebkitVersion)
+
+    tasks.whenTaskAdded { task ->
+        if (task.name.toLowerCase().contains("aarmetadata")) {
+            task.enabled = false
         }
     }
 }

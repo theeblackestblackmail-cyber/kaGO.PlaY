@@ -2,9 +2,7 @@ name: Build Android APK (kaGO.PIaY)
 
 on:
   push:
-    branches: [main, master]
   pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 jobs:
@@ -29,7 +27,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install Project Dependencies
+      - name: Install Dependencies
         run: |
           rm -f package-lock.json bun.lock
           npm install --force
@@ -55,7 +53,7 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Locate & Prepare Output APK
         run: |
@@ -67,5 +65,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kaGO-PIaY-debug-apk
-          path: output/kaGO-PIaY-v1.0.0-debug.apk
+          path: output/*.apk
           retention-days: 30
