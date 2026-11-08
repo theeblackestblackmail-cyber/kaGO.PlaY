@@ -27,6 +27,10 @@ jobs:
         with:
           node-version: 22
 
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
+
       - name: Install Dependencies
         run: |
           rm -f package-lock.json bun.lock

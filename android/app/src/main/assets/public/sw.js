@@ -134,6 +134,9 @@ define(['./workbox-afac4cd2'], (function (workbox) { 'use strict';
     "url": "assets/aistudio/image_623e7721.png",
     "revision": null
   }, {
+    "url": "assets/aistudio/image_61a5209d.png",
+    "revision": null
+  }, {
     "url": "assets/aistudio/image_6128c985.png",
     "revision": null
   }, {
