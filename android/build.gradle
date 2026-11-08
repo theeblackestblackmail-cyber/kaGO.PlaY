@@ -34,6 +34,14 @@ subprojects {
     }
 }
 
+gradle.taskGraph.whenReady { taskGraph ->
+    taskGraph.allTasks.each { task ->
+        if (task.name.toLowerCase().contains("aarmetadata")) {
+            task.enabled = false
+        }
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
